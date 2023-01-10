@@ -22,6 +22,8 @@ public class UIScript : MonoBehaviour
     [SerializeField] private GameObject winEffect;
     [Header("Звук при победе")]
     [SerializeField] private AudioClip winSound;
+	[Header("Стартовый экран игры")]
+    [SerializeField] private GameObject startPanel;
 
     [Header("References (don't touch)")]
 	//Right is used for the score in P1 games
@@ -43,11 +45,15 @@ public class UIScript : MonoBehaviour
     private int startHealth;
 	private int lastScoreToLifesCount = 0;
 	private AudioSource soundEffectsPlayer;
-
 	/// <summary>
-	/// Сумма очков набранная всеми игроками
+	/// Тэг объектов, которые скрыты до начала игры
 	/// </summary>
-	public int TotalScore
+	public const string LEVEL_TAG_NAME = "Level";
+
+    /// <summary>
+    /// Сумма очков набранная всеми игроками
+    /// </summary>
+    public int TotalScore
 	{
 		get
 		{
@@ -64,6 +70,8 @@ public class UIScript : MonoBehaviour
 		startHealth = healthSystem.health;
         creator = GameObject.FindObjectOfType<ObjectCreatorArea>();
 		soundEffectsPlayer = GetComponent<AudioSource>();
+		GameObject.FindGameObjectsWithTag(LEVEL_TAG_NAME).ToList().ForEach(x => x.SetActive(false));
+		gameOver = true;
     }
 
     private void Start()
@@ -93,7 +101,6 @@ public class UIScript : MonoBehaviour
 
     public void Restart()
     {
-		//Debug.Log("Game restarted by User!");		
         statsPanel.SetActive(true);
         gameOverPanel.SetActive(false);
 		// это уже есть в GameOverHandler (по ТЗ)
@@ -102,6 +109,8 @@ public class UIScript : MonoBehaviour
 		RemoveAllPoints();
 		Start();
 		Camera.main.gameObject.GetComponent<AudioSource>().Play();
+        GameObject.FindGameObjectsWithTag(LEVEL_TAG_NAME).ToList().ForEach(x => x.SetActive(true));
+		startPanel.SetActive(false);
         gameOver = false;
     }
 
