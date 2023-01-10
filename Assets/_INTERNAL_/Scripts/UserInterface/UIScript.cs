@@ -77,7 +77,7 @@ public class UIScript : MonoBehaviour
 		{
 			levelObject.SetActive(false);
 		}
-		gameOver = true;
+		gameOver = true;		
     }
 
     private void Start()

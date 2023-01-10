@@ -13,8 +13,6 @@ public class ObjectCreatorArea : MonoBehaviour
 
 	private UIScript ui;
 
-	public float ObjectMovementSpeed = 0.005f;
-
 	[Header("Промежуток времени в секундах между генерацией объектов")]
 	public float SpawnInterval = 2;
     [Header("Модификатор промежутка времени между генерацией объектов")]
@@ -22,23 +20,12 @@ public class ObjectCreatorArea : MonoBehaviour
 
     private BoxCollider2D boxCollider2D;
 
-	private float partOfSpawnAreaWidth, minX, maxX;
-
 	void Start()
 	{
 		ui = GameObject.FindObjectOfType<UIScript>();
 		boxCollider2D = GetComponent<BoxCollider2D>();
-		partOfSpawnAreaWidth = boxCollider2D.size.x / 3;
-		minX = partOfSpawnAreaWidth - boxCollider2D.size.x;
-		maxX = boxCollider2D.size.x - partOfSpawnAreaWidth;
 		StartCoroutine(SpawnObject());
 	}
-
-	public void SetObjectSpeed(float speed)
-	{
-		ObjectMovementSpeed = speed;
-	}
-
 
 	// This will spawn an object, and then wait some time, then spawn another...
 	IEnumerator SpawnObject()
@@ -47,15 +34,11 @@ public class ObjectCreatorArea : MonoBehaviour
 		{
 			if (!ui?.IsGameOver ?? true)
 			{
-				// Generate the new object
-				GameObject newObject = Instantiate<GameObject>(prefabToSpawn);
-                newObject.GetComponent<ObjectMovement>().FallSpeed = ObjectMovementSpeed;
-                newObject.GetComponents<IExternalAudioPlayable>().ToList().ForEach(x => 
-					x.Player = ui.GetComponent<AudioSource>()
-				);
-				float randomX = transform.position.x + Random.Range(minX, maxX);
-				float randomY = Random.Range(-boxCollider2D.size.y, boxCollider2D.size.y);
-				newObject.transform.position = new Vector2(randomX, randomY + transform.position.y);
+				// определяем разворот птицы-несушки
+				var sign = transform.right == Vector3.right ? 1 : -1;
+				var pos = new Vector3(transform.position.x + sign * 3 * boxCollider2D.bounds.extents.x / 2, 
+					  transform.position.y, transform.position.z);
+                GameObject newObject = Instantiate<GameObject>(prefabToSpawn, pos, transform.rotation);				
 			}
             // Wait for some time before spawning another object
             yield return new WaitForSeconds(SpawnInterval * SpawnIntervalCoef);
