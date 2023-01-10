@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3369810633209700043}
   m_Layer: 0
   m_Name: Nest
-  m_TagString: Untagged
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 6964300707768948773}
   m_Layer: 0
   m_Name: AngleBlock
-  m_TagString: Ground
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -129,7 +129,7 @@ GameObject:
   - component: {fileID: 2683002831892650087}
   m_Layer: 0
   m_Name: HorizontalBlock
-  m_TagString: Ground
+  m_TagString: Level
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

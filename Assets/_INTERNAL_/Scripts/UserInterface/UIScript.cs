@@ -48,7 +48,9 @@ public class UIScript : MonoBehaviour
 	/// <summary>
 	/// Тэг объектов, которые скрыты до начала игры
 	/// </summary>
-	public const string LEVEL_TAG_NAME = "Level";
+	private const string LEVEL_TAG_NAME = "Level";
+
+	private IEnumerable<GameObject> levelObject;
 
     /// <summary>
     /// Сумма очков набранная всеми игроками
@@ -70,7 +72,11 @@ public class UIScript : MonoBehaviour
 		startHealth = healthSystem.health;
         creator = GameObject.FindObjectOfType<ObjectCreatorArea>();
 		soundEffectsPlayer = GetComponent<AudioSource>();
-		GameObject.FindGameObjectsWithTag(LEVEL_TAG_NAME).ToList().ForEach(x => x.SetActive(false));
+		levelObject = GameObject.FindGameObjectsWithTag(LEVEL_TAG_NAME);
+		foreach (GameObject levelObject in levelObject)
+		{
+			levelObject.SetActive(false);
+		}
 		gameOver = true;
     }
 
@@ -108,8 +114,8 @@ public class UIScript : MonoBehaviour
         healthSystem.ModifyHealth(startHealth);
 		RemoveAllPoints();
 		Start();
-		Camera.main.gameObject.GetComponent<AudioSource>().Play();
-        GameObject.FindGameObjectsWithTag(LEVEL_TAG_NAME).ToList().ForEach(x => x.SetActive(true));
+		Camera.main.gameObject.GetComponent<AudioSource>().Play();		
+        levelObject.ToList().ForEach(x => x.SetActive(true));
 		startPanel.SetActive(false);
         gameOver = false;
     }
