@@ -105,18 +105,36 @@ public class UIScript : MonoBehaviour
 		lastScoreToLifesCount = 0;
     }
 
+    private void Update()
+    {
+		if (gameOver && Input.GetKeyUp(KeyCode.R))
+		{
+			Restart();
+		}
+    }
+
+    /// <summary>
+    /// Метод перезапуска игры
+	/// </summary>
+	/// <remarks>
+	/// по кнопке «Начать заново»,
+	/// по клавише «R».
+	/// </remarks>
     public void Restart()
     {
         statsPanel.SetActive(true);
         gameOverPanel.SetActive(false);
+        startPanel.SetActive(false);
 		// это уже есть в GameOverHandler (по ТЗ)
 		//GameObject.FindGameObjectsWithTag(creator.prefabToSpawn.tag).ToList().ForEach(t => Destroy(t.gameObject));
-        healthSystem.ModifyHealth(startHealth);
+		if (healthSystem.health <= 0)
+		{
+			healthSystem.ModifyHealth(startHealth);
+		}
 		RemoveAllPoints();
 		Start();
 		Camera.main.gameObject.GetComponent<AudioSource>().Play();		
-        levelObject.ToList().ForEach(x => x.SetActive(true));
-		startPanel.SetActive(false);
+        levelObject.ToList().ForEach(x => x.SetActive(true));		
         gameOver = false;
     }
 

@@ -44,11 +44,17 @@ public class HealthSystemAttribute : MonoBehaviour
 	}
 
 
-	// changes the energy from the player
-	// also notifies the UI (if present)
-	public void ModifyHealth(int amount)
+    /// <summary>
+    /// Method changes the energy from the player
+    /// also notifies the UI (if present)
+    /// </summary>
+	/// <remarks>
+	/// Если скрытый объект излечивается, делает его видимым, если же здоровье объекта становится отрицательным - скрывает объект.
+	/// </remarks>
+    /// <param name="amount"></param>
+    public void ModifyHealth(int amount)
 	{
-		//avoid going over the maximum health by forcin
+		//avoid going over the maximum health by forcing
 		if(health + amount > maxHealth)
 		{
 			amount = maxHealth - health;

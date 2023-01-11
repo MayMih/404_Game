@@ -12,7 +12,9 @@ GameObject:
   - component: {fileID: -7964758934108716204}
   - component: {fileID: -5216851591473157778}
   - component: {fileID: 8704220065077173499}
-  - component: {fileID: -5630518604675983589}
+  - component: {fileID: -2094425311303474519}
+  - component: {fileID: -8090365856172775572}
+  - component: {fileID: -2027339972093338830}
   m_Layer: 0
   m_Name: Egg
   m_TagString: Pickup
@@ -274,17 +276,54 @@ PolygonCollider2D:
       - {x: 0.225, y: -4.705}
       - {x: 0.305, y: -4.6949997}
       - {x: 0.48499998, y: -4.665}
---- !u!114 &-5630518604675983589
+--- !u!114 &-2094425311303474519
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5169978450154421104}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c62d65bd264a4e088b75b7511b9467a, type: 3}
+  m_Script: {fileID: 11500000, guid: bdab9334f9a2a4efe8c019b5d37595cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigidbody2D: {fileID: 0}
-  rotationSpeed: 20
+  actions:
+  - {fileID: -8090365856172775572}
+  useCustomActions: 0
+  customActions:
+    m_PersistentCalls:
+      m_Calls: []
+  happenOnlyOnce: 0
+  filterByTag: 1
+  filterTag: Player
+--- !u!114 &-8090365856172775572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5169978450154421104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be840ffee03ed4abe9b3dc9b48f9cae7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: 0
+  deathEffect: {fileID: 8205706795460263314, guid: 326e86d5729c54e479798cacab220bb2,
+    type: 3}
+  deathSound: {fileID: 8300000, guid: 2489de0949b87fa4aac2a58d014fd376, type: 3}
+--- !u!114 &-2027339972093338830
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5169978450154421104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fa3c260db47248a18ecb8112019040d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  destroyWhenActivated: 0
+  healthChange: -1

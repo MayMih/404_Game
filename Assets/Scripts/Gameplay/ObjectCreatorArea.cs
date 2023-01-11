@@ -38,8 +38,11 @@ public class ObjectCreatorArea : MonoBehaviour
 				var sign = transform.right == Vector3.right ? 1 : -1;
 				var pos = new Vector3(transform.position.x + sign * 3 * boxCollider2D.bounds.extents.x / 2, 
 					  transform.position.y, transform.position.z);
-                GameObject newObject = Instantiate<GameObject>(prefabToSpawn, pos, transform.rotation);				
-			}
+                GameObject newObject = Instantiate(prefabToSpawn, pos, transform.rotation);
+                newObject.GetComponents<IExternalAudioPlayable>().ToList().ForEach(x =>
+                    x.Player = ui.GetComponent<AudioSource>()
+                );
+            }
             // Wait for some time before spawning another object
             yield return new WaitForSeconds(SpawnInterval * SpawnIntervalCoef);
 		}

@@ -897,7 +897,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Game over
+  m_Text: "\u0418\u0433\u0440\u0430 \u043E\u043A\u043E\u043D\u0447\u0435\u043D\u0430"
 --- !u!114 &11444388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2966,7 +2966,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 455, y: -122}
+  m_AnchoredPosition: {x: 403, y: -122}
   m_SizeDelta: {x: -1134, y: -652}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6415953708294466769
@@ -3154,8 +3154,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -21, y: -120}
-  m_SizeDelta: {x: -1184, y: -568}
+  m_AnchoredPosition: {x: -53, y: -120}
+  m_SizeDelta: {x: -1286.2815, y: -568}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7430022318852368904
 CanvasRenderer:
@@ -3198,7 +3198,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Your score is '
+  m_Text: "\u0412\u0430\u0448\u0438 \u043E\u0447\u043A\u0438"
 --- !u!114 &6417021769226505551
 MonoBehaviour:
   m_ObjectHideFlags: 0
