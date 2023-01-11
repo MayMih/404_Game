@@ -11,7 +11,18 @@ public class DestroyAction : Action, IExternalAudioPlayable
 	/// <summary>
 	/// Назначается создателем объекта
 	/// </summary>
+	/// <remarks>
+	/// Если не указан, будет использовано значение из <see cref="UIScript"/>
+	/// </remarks>
     public AudioSource Player { get; set; }
+
+    private void Start()
+    {
+		if (Player == null)
+		{
+			Player = GameObject.FindObjectOfType<UIScript>()?.GetComponent<AudioSource>();
+		}
+    }
 
     //OtherObject is null when this Action is called from a Condition that is not collision-based
     public override bool ExecuteAction(GameObject otherObject)
@@ -35,11 +46,10 @@ public class DestroyAction : Action, IExternalAudioPlayable
 			}
 		}
 		else
-		{
-            Player?.PlayOneShot(deathSound, 1);
+		{            
             Destroy(gameObject);
 		}
-
-		return true; 
+        Player?.PlayOneShot(deathSound, 1);
+        return true; 
 	}
 }

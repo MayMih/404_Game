@@ -25,6 +25,8 @@ public class UIScript : MonoBehaviour
     [SerializeField] private AudioClip winSound;
 	[Header("Стартовый экран игры")]
     [SerializeField] private GameObject startPanel;
+    [Header("Время в секундах между переключением гнёзд")]
+    [SerializeField] public float SwitchInterval;
 
     [Header("References (don't touch)")]
 	//Right is used for the score in P1 games
@@ -53,7 +55,7 @@ public class UIScript : MonoBehaviour
     /// <summary>
     /// Список объектов, которые скрыты до начала игры
     /// </summary>
-    private IEnumerable<GameObject> levelObject;
+    private IEnumerable<GameObject> levelObject;    
 
     /// <summary>
     /// Сумма очков набранная всеми игроками
@@ -123,7 +125,7 @@ public class UIScript : MonoBehaviour
 				cr.SpawnInterval = Random.Range(0.1f, 2);
 				cr.enabled = i == randIndex;
 			}
-			yield return new WaitForSeconds(2);
+			yield return new WaitForSeconds(SwitchInterval);
 		}
     }
 
@@ -166,8 +168,17 @@ public class UIScript : MonoBehaviour
 		AddPoints(playerNumber, 1);
 	}
 
+	/// <summary>
+	/// Добавляет указанное кол-во очков для первого Игрока
+	/// </summary>
+	/// <param name="amount"></param>
+	public void AddPoints(int amount)
+	{
+		AddPoints(0, amount);
+	}
 
-	public void AddPoints(int playerNumber, int amount = 1)
+
+    public void AddPoints(int playerNumber, int amount = 1)
 	{
 		scores[playerNumber] += amount;
 
