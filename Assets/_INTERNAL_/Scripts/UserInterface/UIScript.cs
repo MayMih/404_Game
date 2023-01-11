@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
@@ -41,7 +42,7 @@ public class UIScript : MonoBehaviour
     private Dictionary<int, ResourceStruct> resourcesDict = new Dictionary<int, ResourceStruct>(); 
     private bool gameOver = false;
 	private HealthSystemAttribute healthSystem;
-	private ObjectCreatorArea creator;
+	private ObjectCreatorArea[] creators;
     private int startHealth;
 	private int lastScoreToLifesCount = 0;
 	private AudioSource soundEffectsPlayer;
@@ -49,8 +50,10 @@ public class UIScript : MonoBehaviour
 	/// Тэг объектов, которые скрыты до начала игры
 	/// </summary>
 	private const string LEVEL_TAG_NAME = "Level";
-
-	private IEnumerable<GameObject> levelObject;
+    /// <summary>
+    /// Список объектов, которые скрыты до начала игры
+    /// </summary>
+    private IEnumerable<GameObject> levelObject;
 
     /// <summary>
     /// Сумма очков набранная всеми игроками
@@ -70,7 +73,7 @@ public class UIScript : MonoBehaviour
     {
         healthSystem = GameObject.FindObjectOfType<HealthSystemAttribute>();
 		startHealth = healthSystem.health;
-        creator = GameObject.FindObjectOfType<ObjectCreatorArea>();
+        creators = GameObject.FindObjectsOfType<ObjectCreatorArea>();
 		soundEffectsPlayer = GetComponent<AudioSource>();
 		levelObject = GameObject.FindGameObjectsWithTag(LEVEL_TAG_NAME);
 		foreach (GameObject levelObject in levelObject)
@@ -103,39 +106,58 @@ public class UIScript : MonoBehaviour
             // Life will be provided by the PlayerHealth components
         }
 		lastScoreToLifesCount = 0;
+		// stops all creators except one
+		creators.ToList().ForEach(creator => creator.enabled = false);
+		StartCoroutine(AllowRandomCreator());
     }
 
-    private void Update()
-    {
-		if (gameOver && Input.GetKeyUp(KeyCode.R))
+	private IEnumerator AllowRandomCreator()
+	{
+		while (!gameOver)
 		{
-			Restart();
+			int randIndex = Random.Range(0, creators.Length);
+			Debug.Log($"Starting creator {creators[randIndex]}...");
+			for (int i = 0; i < creators.Length; i++)
+			{
+				var cr = creators[i];
+				cr.SpawnInterval = Random.Range(0.1f, 2);
+				cr.enabled = i == randIndex;
+			}
+			yield return new WaitForSeconds(2);
 		}
     }
 
+    private void Update()
+    {		
+		if (gameOver && Input.GetKeyUp(KeyCode.R))
+		{
+			Restart();
+		}		
+    }
+
+    
+
     /// <summary>
     /// Метод перезапуска игры
-	/// </summary>
-	/// <remarks>
-	/// по кнопке «Начать заново»,
-	/// по клавише «R».
-	/// </remarks>
+    /// </summary>
+    /// <remarks>
+    /// по кнопке «Начать заново»,
+    /// по клавише «R».
+    /// </remarks>
     public void Restart()
     {
         statsPanel.SetActive(true);
         gameOverPanel.SetActive(false);
         startPanel.SetActive(false);
-		// это уже есть в GameOverHandler (по ТЗ)
-		//GameObject.FindGameObjectsWithTag(creator.prefabToSpawn.tag).ToList().ForEach(t => Destroy(t.gameObject));
 		if (healthSystem.health <= 0)
 		{
 			healthSystem.ModifyHealth(startHealth);
 		}
 		RemoveAllPoints();
-		Start();
-		Camera.main.gameObject.GetComponent<AudioSource>().Play();		
-        levelObject.ToList().ForEach(x => x.SetActive(true));		
         gameOver = false;
+        Start();
+		Camera.main.gameObject.GetComponent<AudioSource>().Play();		
+        levelObject.ToList().ForEach(x => x.SetActive(true));		        
     }
 
     //version of the one below with one parameter to be able to connect UnityEvents
@@ -208,7 +230,8 @@ public class UIScript : MonoBehaviour
 			winPanel.SetActive(true);
 			soundEffectsPlayer?.PlayOneShot(winSound);
 			Instantiate(winEffect);
-		}
+            StopCoroutine(AllowRandomCreator());
+        }
 	}
 
 
@@ -222,8 +245,11 @@ public class UIScript : MonoBehaviour
 	        statsPanel.SetActive(false);
 	        gameOverPanel.SetActive(true);
 			// По ТЗ уничтожаем все объекты на экране при конце Игры
-            GameObject.FindGameObjectsWithTag(creator.prefabToSpawn.tag).ToList().ForEach(t => Destroy(t.gameObject));
+            GameObject.FindGameObjectsWithTag(creators.First().prefabToSpawn.tag).ToList().ForEach(t => 
+				Destroy(t.gameObject)
+			);
             totalScore.text = TotalScore.ToString();
+			StopCoroutine(AllowRandomCreator());
         }
     }
 

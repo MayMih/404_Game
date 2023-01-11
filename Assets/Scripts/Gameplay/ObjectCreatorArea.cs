@@ -24,25 +24,30 @@ public class ObjectCreatorArea : MonoBehaviour
     private AudioSource audioPlayer;
     private BoxCollider2D boxCollider2D;
 
+
 	void Start()
 	{
 		ui = GameObject.FindObjectOfType<UIScript>();
         audioPlayer = ui?.GetComponent<AudioSource>();
 		boxCollider2D = GetComponent<BoxCollider2D>();
-		StartCoroutine(SpawnObject());
-	}
+        StartCoroutine(SpawnObject());
+    }
 
-	// This will spawn an object, and then wait some time, then spawn another...
-	IEnumerator SpawnObject()
+    // This will spawn an object, and then wait some time, then spawn another...
+    IEnumerator SpawnObject()
 	{
 		while(true)
 		{
-			if (!ui?.IsGameOver ?? true)
+			if (enabled && (!ui?.IsGameOver ?? true))
 			{
 				// определяем разворот птицы-несушки
 				var sign = transform.right == Vector3.right ? 1 : -1;
 				var pos = new Vector3(transform.position.x + sign * 3 * boxCollider2D.bounds.extents.x / 2, 
 					  transform.position.y, transform.position.z);
+				while (Physics2D.OverlapPoint(pos) != null)
+				{
+                    yield return new WaitForSeconds(SpawnInterval * SpawnIntervalCoef);
+                }
                 GameObject newObject = Instantiate(prefabToSpawn, pos, transform.rotation);
 				if (skinLoader != null)
 				{
