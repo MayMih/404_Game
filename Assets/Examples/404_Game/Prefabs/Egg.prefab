@@ -310,8 +310,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: 0
-  deathEffect: {fileID: 8205706795460263314, guid: 326e86d5729c54e479798cacab220bb2,
-    type: 3}
+  deathEffects:
+  - {fileID: 3432958286849152088, guid: 87ee7299dd44ed747af24dbb91bcd33b, type: 3}
+  - {fileID: 8205706795460263314, guid: 326e86d5729c54e479798cacab220bb2, type: 3}
   deathSound: {fileID: 8300000, guid: 2489de0949b87fa4aac2a58d014fd376, type: 3}
 --- !u!114 &-2027339972093338830
 MonoBehaviour:

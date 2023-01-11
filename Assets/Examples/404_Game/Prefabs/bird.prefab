@@ -126,6 +126,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabToSpawn: {fileID: 5169978450154421104, guid: 667bdcb7286c9c74ab2aefcb711525b1,
     type: 3}
-  ObjectMovementSpeed: 0.005
   SpawnInterval: 2
   SpawnIntervalCoef: 1
+  prerfabSkins:
+  - {fileID: 21300000, guid: 9abf66482f1f08b46adb4600e26e879c, type: 3}
+  - {fileID: 21300000, guid: d29e834a5e946574a99a19f5d5807820, type: 3}
+  - {fileID: 21300000, guid: d800910d1a4d0de499970e4bf5019ac4, type: 3}
+  - {fileID: 21300000, guid: 483e89063417569428aecdf956c22803, type: 3}

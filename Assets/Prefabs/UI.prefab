@@ -853,7 +853,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.004058838}
+  m_AnchoredPosition: {x: 0, y: -71.609985}
   m_SizeDelta: {x: 0, y: -634.84}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &22220914
@@ -1930,7 +1930,7 @@ GameObject:
   - component: {fileID: 1188404799672991740}
   - component: {fileID: 4093104804657880269}
   m_Layer: 5
-  m_Name: FrequencyCaption (1)
+  m_Name: Hint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2966,7 +2966,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 403, y: -122}
+  m_AnchoredPosition: {x: 403, y: -193.6059}
   m_SizeDelta: {x: -1134, y: -652}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6415953708294466769
@@ -3154,8 +3154,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -53, y: -120}
-  m_SizeDelta: {x: -1286.2815, y: -568}
+  m_AnchoredPosition: {x: -72.456604, y: -198}
+  m_SizeDelta: {x: -1247.3683, y: -648.37}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7430022318852368904
 CanvasRenderer:
