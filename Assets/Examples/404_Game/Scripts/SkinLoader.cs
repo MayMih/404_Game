@@ -2,8 +2,10 @@ using UnityEngine;
 
 public class SkinLoader : MonoBehaviour
 {
+    /// <summary>
+    /// Каталог внутри каталога Assets\Resources
+    /// </summary>
     private const string RESOURCE_FOLDER_PATH = "eggs";
-    //@"Easter_UI\eggs";
 
     private Sprite[] skins;
 
@@ -13,13 +15,9 @@ public class SkinLoader : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
         skins = Resources.LoadAll<Sprite>(RESOURCE_FOLDER_PATH);
-        foreach (var t in skins)
-        {
-            Debug.Log(t.name);
-        }
     }
 
 }

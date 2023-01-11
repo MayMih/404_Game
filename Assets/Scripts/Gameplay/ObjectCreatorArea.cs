@@ -11,21 +11,23 @@ public class ObjectCreatorArea : MonoBehaviour
 	// WARNING: take if from the Project panel, NOT the Scene/Hierarchy!
 	public GameObject prefabToSpawn;
 
-	private UIScript ui;	
-
 	[Header("Промежуток времени в секундах между генерацией объектов")]
 	public float SpawnInterval = 2;
     [Header("Модификатор промежутка времени между генерацией объектов")]
     [SerializeField] private int SpawnIntervalCoef = 1;
-	[SerializeField] private Sprite[] prerfabSkins;
-	[Header("Хранитель скинов, если указан, то поле prerfabSkins игнорируется")]
+	[SerializeField] private Sprite[] prefabSkins;
+	[Header("Хранитель скинов, если указан, то поле prefabSkins игнорируется")]
     [SerializeField] private SkinLoader skinLoader;
 
+
+    private UIScript ui;
+    private AudioSource audioPlayer;
     private BoxCollider2D boxCollider2D;
 
 	void Start()
 	{
 		ui = GameObject.FindObjectOfType<UIScript>();
+        audioPlayer = ui?.GetComponent<AudioSource>();
 		boxCollider2D = GetComponent<BoxCollider2D>();
 		StartCoroutine(SpawnObject());
 	}
@@ -48,10 +50,10 @@ public class ObjectCreatorArea : MonoBehaviour
                 }
 				else
 				{
-					newObject.GetComponent<SpriteRenderer>().sprite = prerfabSkins[Random.Range(0, prerfabSkins.Length)];
+					newObject.GetComponent<SpriteRenderer>().sprite = prefabSkins[Random.Range(0, prefabSkins.Length)];
 				}
                 newObject.GetComponents<IExternalAudioPlayable>()?.ToList().ForEach(x =>
-                    x.Player = ui.GetComponent<AudioSource>()
+                    x.Player = audioPlayer
                 );
             }
             // Wait for some time before spawning another object
