@@ -11,13 +11,15 @@ public class ObjectCreatorArea : MonoBehaviour
 	// WARNING: take if from the Project panel, NOT the Scene/Hierarchy!
 	public GameObject prefabToSpawn;
 
-	private UIScript ui;
+	private UIScript ui;	
 
 	[Header("Промежуток времени в секундах между генерацией объектов")]
 	public float SpawnInterval = 2;
     [Header("Модификатор промежутка времени между генерацией объектов")]
     [SerializeField] private int SpawnIntervalCoef = 1;
 	[SerializeField] private Sprite[] prerfabSkins;
+	[Header("Хранитель скинов, если указан, то поле prerfabSkins игнорируется")]
+    [SerializeField] private SkinLoader skinLoader;
 
     private BoxCollider2D boxCollider2D;
 
@@ -40,7 +42,14 @@ public class ObjectCreatorArea : MonoBehaviour
 				var pos = new Vector3(transform.position.x + sign * 3 * boxCollider2D.bounds.extents.x / 2, 
 					  transform.position.y, transform.position.z);
                 GameObject newObject = Instantiate(prefabToSpawn, pos, transform.rotation);
-				newObject.GetComponent<SpriteRenderer>().sprite = prerfabSkins[Random.Range(0, prerfabSkins.Length)];
+				if (skinLoader != null)
+				{
+					newObject.GetComponent<SpriteRenderer>().sprite = skinLoader.GetRandomSkin();
+                }
+				else
+				{
+					newObject.GetComponent<SpriteRenderer>().sprite = prerfabSkins[Random.Range(0, prerfabSkins.Length)];
+				}
                 newObject.GetComponents<IExternalAudioPlayable>()?.ToList().ForEach(x =>
                     x.Player = ui.GetComponent<AudioSource>()
                 );
