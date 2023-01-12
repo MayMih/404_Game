@@ -84,6 +84,9 @@ public class UIScript : MonoBehaviour
 	private PersonPosition currentPosition;
     private float worldCenterX;
     private float personWidth;
+    private float personShift;
+    private float basketShiftX;
+    private float basketShiftY;
 
     #endregion 'Поля и константы'
 
@@ -115,6 +118,9 @@ public class UIScript : MonoBehaviour
 		}
 		worldCenterX = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, 0, 0)).x;
 		personWidth = person.GetComponent<SpriteRenderer>().bounds.size.x;
+		personShift = 5 * personWidth / 4;
+        basketShiftX = 4 * personWidth / 5;
+		basketShiftY = 5 * person.GetComponent<SpriteRenderer>().bounds.extents.y / 4;
         gameOver = true;		
     }
 
@@ -170,13 +176,8 @@ public class UIScript : MonoBehaviour
 		}
 		else if (!gameOver)
 		{
-            //
-            if (currentPosition == PersonPosition.None)
-            {
-                currentPosition = PersonPosition.BottomRight;
-            }
             var direction = PersonPosition.None;
-			if (Input.GetKeyDown(KeyCode.RightArrow) && !currentPosition.HasFlag(PersonPosition.Right))
+            if (Input.GetKeyDown(KeyCode.RightArrow) && !currentPosition.HasFlag(PersonPosition.Right))
 			{
                 // переместить корзину Вправо на текущей высоте
                 direction = PersonPosition.Right;
@@ -231,66 +232,70 @@ public class UIScript : MonoBehaviour
 	/// </param>
     private void MovePerson(PersonPosition pos)
     {
+		if (currentPosition == pos)
+		{
+			return;
+		}
         // если в новой позиции задано только направление (ВЛЕВО, ВПРАВО, ВВЕРХ, ВНИЗ), то просто добавляем его к текущей позиции
         var persPos = person.transform.position;
 		var basketPos = basket.transform.position;
         switch (pos)
 		{
-			case PersonPosition.Right:
-			{
-                persPos.x = worldCenterX + 5 * personWidth / 4;
-				basketPos.x = persPos.x + 4 * personWidth / 5;
-				person.transform.position = persPos;
-                basket.transform.position = basketPos;
-				pos = (currentPosition.HasFlag(PersonPosition.Top) ? PersonPosition.Top : PersonPosition.Bottom) | pos;
-                break;
-			}
+            case PersonPosition.Right:
             case PersonPosition.Left:
-            {				
-                persPos.x = worldCenterX - 5 * personWidth / 4;
-                basketPos.x = persPos.x - 4 * personWidth / 5;
-                person.transform.position = persPos;
-				basket.transform.position = basketPos;
-                pos = (currentPosition.HasFlag(PersonPosition.Top) ? PersonPosition.Top : PersonPosition.Bottom) | pos;
+            {
+                var sign = pos == PersonPosition.Right ? 1 : -1;
+                persPos.x = worldCenterX + sign * this.personShift;
+				if (currentPosition.HasFlag(PersonPosition.Top))
+				{
+					basketPos.x = persPos.x;
+                    pos |= PersonPosition.Top;
+                }
+				else
+				{
+                    basketPos.x = persPos.x + sign * this.basketShiftX;
+                    pos |= PersonPosition.Bottom;
+                }
                 break;
             }
-            case PersonPosition.Top:
+			case PersonPosition.Top:
 			{
 				basketPos.x = persPos.x;
-				basketPos.y = persPos.y + 5 * person.GetComponent<SpriteRenderer>().bounds.extents.y / 4;
-                basket.transform.position = basketPos;
-                pos = (currentPosition.HasFlag(PersonPosition.Left) ? PersonPosition.Left : PersonPosition.Right) | pos;
-                break;
+				basketPos.y = persPos.y + basketShiftY;
+				pos = (currentPosition.HasFlag(PersonPosition.Left) ? PersonPosition.Left : PersonPosition.Right) | pos;
+				break;
 			}
-            case PersonPosition.Bottom:
+			case PersonPosition.Bottom:
             {
 				var sign = currentPosition.HasFlag(PersonPosition.Right) ? 1 : -1;
-                basketPos.x = persPos.x + sign * 4 * personWidth / 5;
+                basketPos.x = persPos.x + sign * this.basketShiftX;
                 basketPos.y = persPos.y;
-                basket.transform.position = basketPos;
                 pos = (currentPosition.HasFlag(PersonPosition.Left) ? PersonPosition.Left : PersonPosition.Right) | pos;
                 break;
             }
             case PersonPosition.TopLeft:
-			{
+            case PersonPosition.TopRight:
+            {
+                var sign = pos.HasFlag(PersonPosition.Right) ? 1 : -1;
+                persPos.x = worldCenterX + sign * this.personShift;
+                basketPos.x = persPos.x;
+                basketPos.y = persPos.y + basketShiftY;
                 break;
 			}
-			case PersonPosition.BottomLeft: 
-			{
-                break; 
-			}
-			case PersonPosition.TopRight:
-			{
-                break;
-			}
+			case PersonPosition.BottomLeft:
             case PersonPosition.BottomRight:
             {
-                break;
-            }
+                var sign = pos.HasFlag(PersonPosition.Right) ? 1 : -1;
+                persPos.x = worldCenterX + sign * this.personShift;
+                basketPos.x = persPos.x + sign * this.basketShiftX;
+                basketPos.y = persPos.y;
+                break; 
+			}
         }
+        person.transform.position = persPos;
+        basket.transform.position = basketPos;
         currentPosition = pos;
-		//
-        Debug.Log($"New Position: {currentPosition}");
+        //Debug.Log($"New Position: {currentPosition}");
     }
 
     /// <summary>
@@ -313,7 +318,10 @@ public class UIScript : MonoBehaviour
         gameOver = false;
         Start();
 		Camera.main.gameObject.GetComponent<AudioSource>().Play();		
-        levelObject.ToList().ForEach(x => x.SetActive(true));		        
+        levelObject.ToList().ForEach(x => x.SetActive(true));
+		MovePerson(PersonPosition.BottomRight);
+        person.SetActive(true);
+        basket.SetActive(true);
     }
 
     //version of the one below with one parameter to be able to connect UnityEvents
@@ -392,9 +400,11 @@ public class UIScript : MonoBehaviour
 			gameOver = true;
 			winLabel.text = "Player " + ++playerNumber + " wins!";
 			statsPanel.SetActive(false);
-			winPanel.SetActive(true);
-			soundEffectsPlayer?.PlayOneShot(winSound);
+			winPanel.SetActive(true);            
+            soundEffectsPlayer?.PlayOneShot(winSound);
 			Instantiate(winEffect);
+            person.SetActive(false);
+            basket.SetActive(false);
             StopCoroutine(AllowRandomCreator());
         }
 	}
@@ -413,6 +423,8 @@ public class UIScript : MonoBehaviour
             GameObject.FindGameObjectsWithTag(creators.First().prefabToSpawn.tag).ToList().ForEach(t => 
 				Destroy(t.gameObject)
 			);
+            person.SetActive(false);
+			basket.SetActive(false);
             totalScore.text = TotalScore.ToString();
 			StopCoroutine(AllowRandomCreator());
         }
