@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,6 +9,26 @@ using UnityEngine.UI;
 [AddComponentMenu("")]
 public class UIScript : MonoBehaviour
 {
+	/// <summary>
+	/// Возможные положения персонажа с корзиной
+	/// </summary>
+	[Flags]
+	private enum PersonPosition : byte
+	{
+		None = 0,
+		Left =	 0b0000_0001,
+		Right =	 0b0000_0010,
+		Top =	 0b0000_0100,
+		Bottom = 0b0000_1000,
+		TopLeft = Left | Top,
+		BottomRight = Right | Bottom,
+		TopRight = Right | Top,
+		BottomLeft = Left | Bottom,
+	}
+
+
+    #region 'Поля и константы'
+
     [Header("Configuration")]
 	public Players numberOfPlayers = Players.OnePlayer;
 
@@ -25,8 +46,12 @@ public class UIScript : MonoBehaviour
     [SerializeField] private AudioClip winSound;
 	[Header("Стартовый экран игры")]
     [SerializeField] private GameObject startPanel;
+    [Header("Игрок и корзина для яиц")]
+    [SerializeField] private GameObject person;
+    [SerializeField] private GameObject basket;
+
     [Header("Время в секундах между переключением гнёзд")]
-    [SerializeField] public float SwitchInterval;
+    [SerializeField] public float SwitchInterval;    
 
     [Header("References (don't touch)")]
 	//Right is used for the score in P1 games
@@ -55,7 +80,13 @@ public class UIScript : MonoBehaviour
     /// <summary>
     /// Список объектов, которые скрыты до начала игры
     /// </summary>
-    private IEnumerable<GameObject> levelObject;    
+    private IEnumerable<GameObject> levelObject;
+	private PersonPosition currentPosition;
+    private float worldCenterX;
+    private float personWidth;
+
+    #endregion 'Поля и константы'
+
 
     /// <summary>
     /// Сумма очков набранная всеми игроками
@@ -82,7 +113,9 @@ public class UIScript : MonoBehaviour
 		{
 			levelObject.SetActive(false);
 		}
-		gameOver = true;		
+		worldCenterX = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, 0, 0)).x;
+		personWidth = person.GetComponent<SpriteRenderer>().bounds.size.x;
+        gameOver = true;		
     }
 
     private void Start()
@@ -117,12 +150,12 @@ public class UIScript : MonoBehaviour
 	{
 		while (!gameOver)
 		{
-			int randIndex = Random.Range(0, creators.Length);
-			Debug.Log($"Starting creator {creators[randIndex]}...");
+			int randIndex = UnityEngine.Random.Range(0, creators.Length);
+			//Debug.Log($"Starting creator {creators[randIndex]}...");
 			for (int i = 0; i < creators.Length; i++)
 			{
 				var cr = creators[i];
-				cr.SpawnInterval = Random.Range(0.1f, 2);
+				cr.SpawnInterval = UnityEngine.Random.Range(0.1f, 2);
 				cr.enabled = i == randIndex;
 			}
 			yield return new WaitForSeconds(SwitchInterval);
@@ -130,14 +163,139 @@ public class UIScript : MonoBehaviour
     }
 
     private void Update()
-    {		
+    {
 		if (gameOver && Input.GetKeyUp(KeyCode.R))
 		{
 			Restart();
-		}		
+		}
+		else if (!gameOver)
+		{
+            //
+            if (currentPosition == PersonPosition.None)
+            {
+                currentPosition = PersonPosition.BottomRight;
+            }
+            var direction = PersonPosition.None;
+			if (Input.GetKeyDown(KeyCode.RightArrow) && !currentPosition.HasFlag(PersonPosition.Right))
+			{
+                // переместить корзину Вправо на текущей высоте
+                direction = PersonPosition.Right;
+			}
+            else if (Input.GetKeyDown(KeyCode.LeftArrow) && !currentPosition.HasFlag(PersonPosition.Left))
+            {
+                // переместить корзину Влево на текущей высоте
+                direction = PersonPosition.Left;
+            }
+            else if (Input.GetKeyDown(KeyCode.UpArrow) && !currentPosition.HasFlag(PersonPosition.Top))
+            {
+                // переместить корзину Вверх на текущей стороне
+                direction = PersonPosition.Top;
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow) && !currentPosition.HasFlag(PersonPosition.Bottom))
+            {
+                // переместить корзину Вниз на текущей стороне
+                direction = PersonPosition.Bottom;
+            }
+            else if (Input.GetKeyDown(KeyCode.Q) && currentPosition != PersonPosition.TopLeft)
+            {
+                // переместить корзину в Верхний Левый угол
+                direction = PersonPosition.TopLeft;
+            }
+            else if (Input.GetKeyDown(KeyCode.A) && currentPosition != PersonPosition.BottomLeft)
+            {
+				// переместить корзину в Нижний Левый угол
+				direction = PersonPosition.BottomLeft;
+            }
+            else if (Input.GetKeyDown(KeyCode.E) && currentPosition != PersonPosition.TopRight)
+            {
+                // переместить корзину в Верхний Правый угол
+                direction = PersonPosition.TopRight;
+            }
+            else if (Input.GetKeyDown(KeyCode.D) && currentPosition != PersonPosition.BottomRight)
+            {
+				// переместить корзину в Нижний Правый угол
+				direction = PersonPosition.BottomRight;
+            }
+			if (direction != PersonPosition.None)
+			{
+				MovePerson(direction);
+			}
+        }
     }
 
-    
+	/// <summary>
+	/// Метод перемещения персонажа и/или корзины в указанное положение
+	/// </summary>
+	/// <param name="pos">
+	/// Новое положение или его элемент
+	/// </param>
+    private void MovePerson(PersonPosition pos)
+    {
+        // если в новой позиции задано только направление (ВЛЕВО, ВПРАВО, ВВЕРХ, ВНИЗ), то просто добавляем его к текущей позиции
+        var persPos = person.transform.position;
+		var basketPos = basket.transform.position;
+        switch (pos)
+		{
+			case PersonPosition.Right:
+			{
+                persPos.x = worldCenterX + personWidth;
+				basketPos.x = persPos.x + 4 * personWidth / 5;
+				person.transform.position = persPos;
+                basket.transform.position = basketPos;
+				//currentPosition = (currentPosition ^ PersonPosition.Left) | pos;
+				pos = (currentPosition.HasFlag(PersonPosition.Top) ? PersonPosition.Top : PersonPosition.Bottom) | pos;
+                break;
+			}
+            case PersonPosition.Left:
+            {				
+                persPos.x = worldCenterX - personWidth;
+                basketPos.x = persPos.x - 4 * personWidth / 5;
+                person.transform.position = persPos;
+				basket.transform.position = basketPos;
+                //currentPosition = (currentPosition ^ PersonPosition.Right) | pos;
+                pos = (currentPosition.HasFlag(PersonPosition.Top) ? PersonPosition.Top : PersonPosition.Bottom) | pos;
+                break;
+            }
+            case PersonPosition.Top:
+			{
+				basketPos.x = persPos.x;
+				basketPos.y = persPos.y + person.GetComponent<SpriteRenderer>().bounds.extents.y;
+                basket.transform.position = basketPos;
+                //currentPosition = (currentPosition ^ PersonPosition.Bottom) | pos;
+                pos = (currentPosition.HasFlag(PersonPosition.Left) ? PersonPosition.Left : PersonPosition.Right) | pos;
+                break;
+			}
+            case PersonPosition.Bottom:
+            {
+				var sign = currentPosition.HasFlag(PersonPosition.Right) ? 1 : -1;
+                basketPos.x = persPos.x + sign * 4 * personWidth / 5;
+                basketPos.y = persPos.y;
+                basket.transform.position = basketPos;
+                //currentPosition = (currentPosition ^ PersonPosition.Top) | pos;
+                pos = (currentPosition.HasFlag(PersonPosition.Left) ? PersonPosition.Left : PersonPosition.Right) | pos;
+                break;
+            }
+            case PersonPosition.TopLeft:
+			{
+                break;
+			}
+			case PersonPosition.BottomLeft: 
+			{
+                break; 
+			}
+			case PersonPosition.TopRight:
+			{
+                break;
+			}
+            case PersonPosition.BottomRight:
+            {
+                break;
+            }
+        }
+        currentPosition = pos;
+		//
+        Debug.Log($"New Position: {currentPosition}");
+    }
 
     /// <summary>
     /// Метод перезапуска игры

@@ -5,8 +5,8 @@ public class DestroyAction : Action, IExternalAudioPlayable
 {
 	//who gets destroyed in the collision?
 	public Enums.Targets target = Enums.Targets.ObjectThatCollided;
-	// assign an effect (explosion? particles?) or object to be created (instantiated) when the one gets destroyed
-	public GameObject[] deathEffects;
+    // assign an effect (explosion? particles?) or object to be created (instantiated) when the one gets destroyed
+    [SerializeField] private GameObject[] deathEffects;
 	[SerializeField] private AudioClip deathSound;	
 	/// <summary>
 	/// Назначается создателем объекта

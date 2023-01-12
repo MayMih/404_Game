@@ -50,7 +50,7 @@ public class InspectorBase : Editor
 	// Used usually when there is an optional field
 	protected bool CheckIfAssigned(string propertyName, bool checkIfPrefab = true)
 	{
-		Object genericObject = serializedObject.FindProperty(propertyName).objectReferenceValue;
+		Object genericObject = serializedObject.FindProperty(propertyName)?.objectReferenceValue;
 		if(genericObject != null)
 		{
 			GameObject go = genericObject as GameObject;
