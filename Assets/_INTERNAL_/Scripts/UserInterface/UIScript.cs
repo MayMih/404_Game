@@ -238,30 +238,27 @@ public class UIScript : MonoBehaviour
 		{
 			case PersonPosition.Right:
 			{
-                persPos.x = worldCenterX + personWidth;
+                persPos.x = worldCenterX + 5 * personWidth / 4;
 				basketPos.x = persPos.x + 4 * personWidth / 5;
 				person.transform.position = persPos;
                 basket.transform.position = basketPos;
-				//currentPosition = (currentPosition ^ PersonPosition.Left) | pos;
 				pos = (currentPosition.HasFlag(PersonPosition.Top) ? PersonPosition.Top : PersonPosition.Bottom) | pos;
                 break;
 			}
             case PersonPosition.Left:
             {				
-                persPos.x = worldCenterX - personWidth;
+                persPos.x = worldCenterX - 5 * personWidth / 4;
                 basketPos.x = persPos.x - 4 * personWidth / 5;
                 person.transform.position = persPos;
 				basket.transform.position = basketPos;
-                //currentPosition = (currentPosition ^ PersonPosition.Right) | pos;
                 pos = (currentPosition.HasFlag(PersonPosition.Top) ? PersonPosition.Top : PersonPosition.Bottom) | pos;
                 break;
             }
             case PersonPosition.Top:
 			{
 				basketPos.x = persPos.x;
-				basketPos.y = persPos.y + person.GetComponent<SpriteRenderer>().bounds.extents.y;
+				basketPos.y = persPos.y + 5 * person.GetComponent<SpriteRenderer>().bounds.extents.y / 4;
                 basket.transform.position = basketPos;
-                //currentPosition = (currentPosition ^ PersonPosition.Bottom) | pos;
                 pos = (currentPosition.HasFlag(PersonPosition.Left) ? PersonPosition.Left : PersonPosition.Right) | pos;
                 break;
 			}
@@ -271,7 +268,6 @@ public class UIScript : MonoBehaviour
                 basketPos.x = persPos.x + sign * 4 * personWidth / 5;
                 basketPos.y = persPos.y;
                 basket.transform.position = basketPos;
-                //currentPosition = (currentPosition ^ PersonPosition.Top) | pos;
                 pos = (currentPosition.HasFlag(PersonPosition.Left) ? PersonPosition.Left : PersonPosition.Right) | pos;
                 break;
             }
