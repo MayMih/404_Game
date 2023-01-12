@@ -49,6 +49,9 @@ public class UIScript : MonoBehaviour
     [Header("Игрок и корзина для яиц")]
     [SerializeField] private GameObject person;
     [SerializeField] private GameObject basket;
+    [Header("Границы интервала случайного времени между генерацией нового яйца")]
+    [SerializeField] private float minNestSpawnInterval = 0.2f;
+    [SerializeField] private float maxNestSpawnInterval = 2f;
 
     [Header("Время в секундах между переключением гнёзд")]
     [SerializeField] public float SwitchInterval;    
@@ -76,12 +79,13 @@ public class UIScript : MonoBehaviour
 	/// <summary>
 	/// Тэг объектов, которые скрыты до начала игры
 	/// </summary>
-	private const string LEVEL_TAG_NAME = "Level";
+	private const string LEVEL_TAG_NAME = "Level";    
+
     /// <summary>
     /// Список объектов, которые скрыты до начала игры
     /// </summary>
     private IEnumerable<GameObject> levelObject;
-	private PersonPosition currentPosition;
+	private PersonPosition currentPosition = PersonPosition.None;
     private float worldCenterX;
     private float personWidth;
     private float personShift;
@@ -116,7 +120,9 @@ public class UIScript : MonoBehaviour
 		{
 			levelObject.SetActive(false);
 		}
-		worldCenterX = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, 0, 0)).x;
+		person.SetActive(false);
+        basket.SetActive(false);
+        worldCenterX = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, 0, 0)).x;
 		personWidth = person.GetComponent<SpriteRenderer>().bounds.size.x;
 		personShift = 5 * personWidth / 4;
         basketShiftX = 4 * personWidth / 5;
@@ -161,7 +167,7 @@ public class UIScript : MonoBehaviour
 			for (int i = 0; i < creators.Length; i++)
 			{
 				var cr = creators[i];
-				cr.SpawnInterval = UnityEngine.Random.Range(0.1f, 2);
+				cr.SpawnInterval = UnityEngine.Random.Range(minNestSpawnInterval, maxNestSpawnInterval);
 				cr.enabled = i == randIndex;
 			}
 			yield return new WaitForSeconds(SwitchInterval);
@@ -275,27 +281,27 @@ public class UIScript : MonoBehaviour
             }
             case PersonPosition.TopLeft:
             case PersonPosition.TopRight:
-            {
-                var sign = pos.HasFlag(PersonPosition.Right) ? 1 : -1;
-                persPos.x = worldCenterX + sign * this.personShift;
-                basketPos.x = persPos.x;
-                basketPos.y = persPos.y + basketShiftY;
-                break;
-			}
-			case PersonPosition.BottomLeft:
+            case PersonPosition.BottomLeft:
             case PersonPosition.BottomRight:
             {
                 var sign = pos.HasFlag(PersonPosition.Right) ? 1 : -1;
                 persPos.x = worldCenterX + sign * this.personShift;
-                basketPos.x = persPos.x + sign * this.basketShiftX;
-                basketPos.y = persPos.y;
+				if (pos.HasFlag(PersonPosition.Top))
+				{
+					basketPos.x = persPos.x;
+					basketPos.y = persPos.y + basketShiftY;
+				}
+				else
+				{
+					basketPos.x = persPos.x + sign * this.basketShiftX;
+					basketPos.y = persPos.y;
+				}
                 break; 
 			}
         }
         person.transform.position = persPos;
         basket.transform.position = basketPos;
         currentPosition = pos;
-        //Debug.Log($"New Position: {currentPosition}");
     }
 
     /// <summary>
